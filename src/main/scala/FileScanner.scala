@@ -1,14 +1,21 @@
 import java.io.File
+import org.slf4j.LoggerFactory
 import scala.io.Source
 
 case class Event(file: File, lineNumber: Int, lines: List[String])
 
+object FileScanner {
+  val logger = LoggerFactory.getLogger(FileScanner.getClass)
+}
+
 class FileScanner(logsDirectory: String) {
+  import FileScanner._
+
   def process(parser: LogParser) {
     tree(new File(logsDirectory)).filter(f => f.isFile).foreach {
       file =>
         if (parser.switchLogFile(file)) {
-          println("Parsing log file " + file.getPath)
+          logger.info("Parsing log file " + file.getPath)
 
           var eventLines = List.empty[String]
           var lineNumber = 1
@@ -26,7 +33,7 @@ class FileScanner(logsDirectory: String) {
           }
         }
         else {
-          println("Log file " + file.getPath + " already exists. Skipping.")
+          logger.info("Log file " + file.getPath + " already exists. Skipping.")
         }
     }
   }
